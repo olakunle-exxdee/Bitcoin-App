@@ -18,7 +18,7 @@ const List = ({ symbol, name, id, image }) => {
               <Link
                 type="button"
                 className="btn btn-lg btn-outline-primary "
-                to={`/${id}`}
+                to={`/items/${id}`}
               >
                 Details
               </Link>

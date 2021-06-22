@@ -7,7 +7,7 @@ function App() {
     <Router>
       <Switch>
         <Route path="/" exact component={ItemCryto} />
-        <Route path="/:id" component={ListDetails} />
+        <Route path="/items/:id" component={ListDetails} />
       </Switch>
     </Router>
   );
