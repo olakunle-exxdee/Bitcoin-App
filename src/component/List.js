@@ -20,7 +20,7 @@ const List = ({ symbol, name, id, image }) => {
                 className="btn btn-lg btn-outline-primary "
                 to={`/${id}`}
               >
-                View
+                Details
               </Link>
             </div>
           </div>
