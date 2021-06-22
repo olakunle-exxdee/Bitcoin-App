@@ -1,32 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const List = ({
-  symbol,
-  name,
-  id,
-  current_price,
-  image,
-  price_change_percentage_24h,
-}) => {
+const List = ({ symbol, name, id, image }) => {
   return (
-    <div key={id} className="wrapper">
-      <div className="title">
-        <img src={image} alt={symbol} />
-        <h1>
-          <Link className="name" to={`/items/${id}`}>
-            {name}
-          </Link>
-        </h1>
-      </div>
-
-      <div className="others">
-        <p>${current_price}</p>
-        {parseInt(price_change_percentage_24h) <= 0 ? (
-          <p className="red">{parseInt(price_change_percentage_24h)}%</p>
-        ) : (
-          <p className="green">{parseInt(price_change_percentage_24h)}%</p>
-        )}
+    <div className="col-md-4 text-center mt-1">
+      <div className="card mb-4 box-shadow bg-light mt-2 outline-danger">
+        <img
+          className=" w-25  img-fluid  mx-auto "
+          alt={symbol}
+          src={image}
+          data-holder-rendered="true"
+        ></img>
+        <div className="card-body">
+          <p className="h1 text-dark">{name}</p>
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="btn-group mx-auto my-2">
+              <Link
+                type="button"
+                className="btn btn-lg btn-outline-primary "
+                to={`/${id}`}
+              >
+                View
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

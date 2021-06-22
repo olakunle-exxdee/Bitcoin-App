@@ -1,60 +1,89 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import HistoryChart from "./HistoryChart";
+import coinGecko from "../api/coinGecko";
+import MoonLoader from "react-spinners/ClipLoader";
+import { css } from "@emotion/react";
+import CoinData from "./CoinData";
 
 const ListDetails = ({ match }) => {
-  const [details, setDetails] = useState([]);
-
-  const url =
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false";
-
-  const fetchDetails = async () => {
-    const response = await fetch(url);
-    const details = await response.json();
-
-    setDetails(details);
-    // if(match.params.id ===  )
+  const [coinData, setCoinData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const formatData = (data) => {
+    return data.map((el) => {
+      return {
+        t: el[0],
+        y: el[1].toFixed(2),
+      };
+    });
   };
 
-  const filterdetails = () => {};
+  const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: blue;
+  `;
   useEffect(() => {
-    fetchDetails();
-    console.log(match);
-  }, []);
-  const filterCoins = details.filter((item) => {
-    if (item.id === match.params.id) {
-      return item;
-    }
-  });
+    const fetchData = async () => {
+      setIsLoading(true);
+      const [day, week, year, detail] = await Promise.all([
+        coinGecko.get(`/coins/${match.params.id}/market_chart/`, {
+          params: {
+            vs_currency: "usd",
+            days: "1",
+          },
+        }),
+        coinGecko.get(`/coins/${match.params.id}/market_chart/`, {
+          params: {
+            vs_currency: "usd",
+            days: "7",
+          },
+        }),
+        coinGecko.get(`/coins/${match.params.id}/market_chart/`, {
+          params: {
+            vs_currency: "usd",
+            days: "365",
+          },
+        }),
+        coinGecko.get("/coins/markets/", {
+          params: {
+            vs_currency: "usd",
+            ids: match.params.id,
+          },
+        }),
+      ]);
+      setCoinData({
+        day: formatData(day.data.prices),
+        week: formatData(week.data.prices),
+        year: formatData(year.data.prices),
+        detail: detail.data[0],
+      });
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, [match.params.id]);
+
+  if (isLoading) {
+    return (
+      <div className="loader">
+        <MoonLoader
+          color="blue"
+          css={override}
+          loading={isLoading}
+          size={150}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container">
-      {filterCoins.map((item) => {
-        const {
-          symbol,
-          name,
-          id,
-          current_price,
-          image,
-          price_change_percentage_24h,
-        } = item;
-        return (
-          <div key={id} className="wrapper">
-            <div className="title">
-              <img src={image} alt={symbol} />
-              <h1>{name}</h1>
-            </div>
-
-            <div className="others">
-              <p>${current_price}</p>
-              {parseInt(price_change_percentage_24h) <= 0 ? (
-                <p className="red">{parseInt(price_change_percentage_24h)}%</p>
-              ) : (
-                <p className="green">
-                  {parseInt(price_change_percentage_24h)}%
-                </p>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      <Link type="button" className="btn btn-primary btn-lg" to={`/`}>
+        Back
+      </Link>
+      <HistoryChart data={coinData} />
+      <CoinData data={coinData.detail} />
     </div>
   );
 };
